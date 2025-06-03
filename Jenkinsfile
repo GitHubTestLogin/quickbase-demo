@@ -2,17 +2,18 @@ pipeline {
     agent any
 
     environment {
-        GITHUB_CRED = credential('GIT_HUB_CREDENTIALS')
-        DOCKER_HUB_CRED = credential('DOCKER_HUB_PASSWORD')
+      //  GITHUB_CRED = credential('GIT_HUB_CREDENTIALS')
+      //  DOCKER_HUB_CRED = credential('DOCKER_HUB_PASSWORD')
         IMAGE_NAME = 'pkm23/quickbase:quickbase-demo'
         IMAGE_TAG = 'latest'
-	    GITHUB_URL = 'https://github.com/GitHubTestLogin/quickbase-demo.git'
+        GITHUB_URL = 'https://github.com/GitHubTestLogin/quickbase-demo.git'
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: 'master', url: "${GITHUB_URL}"
+          //      git branch: 'master', url: "${GITHUB_URL}"
+		git 'https://github.com/GitHubTestLogin/quickbase-demo.git'
             }
         }
 
@@ -22,11 +23,18 @@ pipeline {
             }
         }
 
-        stage('Login to Docker Hub') {
+//        stage('Login to Docker Hub') {
+ //           steps {
+  //              sh """
+  //                  echo "${DOCKER_HUB_PASS}" | docker login -u "${DOCKER_HUB_USR}" --password-stdin //
+ //               """
+ //           }
+//        }
+	stage('Docker Login') {
             steps {
-                sh """
-                    echo "${DOCKER_HUB_PASS}" | docker login -u "${DOCKER_HUB_USR}" --password-stdin //
-                """
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                }
             }
         }
 
