@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         GITHUB_CRED = credential('GIT_HUB_CREDENTIALS')
+        DOCKER_HUB_CRED = credential('DOCKER_HUB_PASSWORD')
         IMAGE_NAME = 'pkm23/quickbase:quickbase-demo'
         IMAGE_TAG = 'latest'
 	    GITHUB_URL = 'https://github.com/GitHubTestLogin/quickbase-demo.git'
@@ -61,9 +62,9 @@ pipeline {
         }
     }
 
-    post {
-        always {
-            sh 'docker logout'
-        }
-    }
+//    post {
+ //       always {
+ //           sh 'docker logout'
+ //       }
+//    }
 }
