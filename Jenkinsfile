@@ -4,7 +4,7 @@ pipeline {
     environment {
       //  GITHUB_CRED = credential('GIT_HUB_CREDENTIALS')
       //  DOCKER_HUB_CRED = credential('DOCKER_HUB_PASSWORD')
-        IMAGE_NAME = 'pkm23/quickbase:quickbase-demo'
+        IMAGE_NAME = 'pkm23/quickbase:craft_demo'
         IMAGE_TAG = 'latest'
         GITHUB_URL = 'https://github.com/GitHubTestLogin/quickbase-demo.git'
     }
@@ -43,15 +43,15 @@ pipeline {
 
             steps {
                 sh """
-                    docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
+                    docker build -t craft_demo .
                 """
             }
         }
 
         stage('Push Docker Image') {
             steps {
-                sh "docker tag quickbase-demo ${IMAGE_NAME}:${IMAGE_TAG}"
-                sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
+                sh "docker tag craft_demo pkm23/quickbase:craft_demo"
+                sh "docker push pkm23/quickbase:craft_demo"
             }
         }
 
@@ -59,7 +59,7 @@ pipeline {
             steps {
                 sh """
                     # Optionally update image in deployment file if not parameterized
-                    sed -i 's|image: .*|image: ${IMAGE_NAME}:${IMAGE_TAG}|' quickbase-demo.yaml
+                    sed -i 's|image: .*|image: ${IMAGE_NAME}|' quickbase-demo.yaml
 
                     # Apply deployment
                     kubectl apply -f quickbase-demo.yaml
