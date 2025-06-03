@@ -2,89 +2,68 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'your-dockerhub-username/your-app-name'
-        DOCKER_CREDENTIALS_ID = 'dockerhub-creds'   // Jenkins credentials ID for Docker Hub
+        GITHUB_CRED = credential('GIT_HUB_CREDENTIALS')
+        IMAGE_NAME = 'pkm23/quickbase:quickbase-demo'
+        IMAGE_TAG = 'latest'
+	    GITHUB_URL = 'https://github.com/GitHubTestLogin/quickbase-demo.git'
     }
 
     stages {
-        stage('Checkout') {
+        stage('Checkout Code') {
             steps {
-                git 'https://github.com/your-username/your-repo.git'
+                git branch: 'main', url: "${GITHUB_URL}"
             }
         }
 
         stage('Build with Gradle') {
             steps {
-                sh './gradlew build'
+                sh './gradlew clean build'
+            }
+        }
+
+        stage('Login to Docker Hub') {
+            steps {
+                sh """
+                    echo "${DOCKER_HUB_PASS}" | docker login -u "${DOCKER_HUB_USR}" --password-stdin //
+                """
             }
         }
 
         stage('Build Docker Image') {
+
             steps {
-                script {
-                    docker.build("${DOCKER_IMAGE}:latest")
-                }
+                sh """
+                    docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
+                """
             }
         }
 
-        stage('Push Docker Image to Docker Hub') {
+        stage('Push Docker Image') {
             steps {
-                script {
-                    docker.withRegistry('https://index.docker.io/v1/', "${DOCKER_CREDENTIALS_ID}") {
-                        docker.image("${DOCKER_IMAGE}:latest").push()
-                    }
-                }
+                sh "docker tag quickbase-demo ${IMAGE_NAME}:${IMAGE_TAG}"
+                sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
             }
         }
 
         stage('Deploy to Minikube') {
             steps {
-                script {
-                    sh '''
-                    # Set Docker CLI to use Minikube's Docker daemon if necessary
-                    # eval $(minikube -p minikube docker-env)
-
-                    # Create Kubernetes deployment YAML
-                    cat <<EOF > k8s-deployment.yaml
-                    apiVersion: apps/v1
-                    kind: Deployment
-                    metadata:
-                      name: your-app
-                    spec:
-                      replicas: 1
-                      selector:
-                        matchLabels:
-                          app: your-app
-                      template:
-                        metadata:
-                          labels:
-                            app: your-app
-                        spec:
-                          containers:
-                          - name: your-app
-                            image: your-dockerhub-username/your-app-name:latest
-                            ports:
-                            - containerPort: 8080
-                    ---
-                    apiVersion: v1
-                    kind: Service
-                    metadata:
-                      name: your-app-service
-                    spec:
-                      selector:
-                        app: your-app
-                      ports:
-                        - protocol: TCP
-                          port: 80
-                          targetPort: 8080
-                      type: NodePort
-                    EOF
+                sh """
+                    # Optionally update image in deployment file if not parameterized
+                    sed -i 's|image: .*|image: ${IMAGE_NAME}:${IMAGE_TAG}|' quickbase-demo.yaml
 
                     # Apply deployment
-                    kubectl apply -f k8s-deployment.yaml
-                    '''
-                }
+                    kubectl apply -f quickbase-demo.yaml
+
+                    # Wait for the deployment to complete
+                    kubectl rollout status deployment.apps/demo-app
+                """
             }
+        }
+    }
+
+    post {
+        always {
+            sh 'docker logout'
         }
     }
 }
