@@ -20,14 +20,8 @@ pipeline {
         stage('Deploy to Minikube') {
             steps {
                 sh """
-                    # Optionally update image in deployment file if not parameterized
-                    sed -i 's|image: .*|image: ${IMAGE_NAME}|' quickbase-demo.yaml
-
                     # Apply deployment
                     kubectl apply -f quickbase-demo.yaml
-
-                    # Wait for the deployment to complete
-                    kubectl rollout status deployment.apps/demo-app
                 """
             }
        }
