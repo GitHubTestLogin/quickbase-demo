@@ -21,7 +21,7 @@ pipeline {
             steps {
                 sh """
                     # Apply deployment
-                    kubectl apply -f quickbase-demo.yaml
+                    kubectl apply --validate=false -f quickbase-demo.yaml
                 """
             }
        }
