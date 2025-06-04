@@ -8,7 +8,7 @@ pipeline {
         IMAGE_TAG = 'latest'
         GITHUB_URL = 'https://github.com/GitHubTestLogin/quickbase-demo.git'
     }
-
+  stages {
 	stage('Docker Login') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
@@ -31,5 +31,5 @@ pipeline {
                 """
             }
        }
- 
+    }
 }
