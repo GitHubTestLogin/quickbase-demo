@@ -9,49 +9,11 @@ pipeline {
         GITHUB_URL = 'https://github.com/GitHubTestLogin/quickbase-demo.git'
     }
 
-    stages {
-        stage('Checkout Code') {
-            steps {
-          //      git branch: 'master', url: "${GITHUB_URL}"
-		git 'https://github.com/GitHubTestLogin/quickbase-demo.git'
-            }
-        }
-
-        stage('Build with Gradle') {
-            steps {
-		sh 'chmod +x ./gradlew'
-                sh './gradlew clean build'
-            }
-        }
-
-//        stage('Login to Docker Hub') {
- //           steps {
-  //              sh """
-  //                  echo "${DOCKER_HUB_PASS}" | docker login -u "${DOCKER_HUB_USR}" --password-stdin //
- //               """
- //           }
-//        }
 	stage('Docker Login') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
                 }
-            }
-        }
-
-        stage('Build Docker Image') {
-
-            steps {
-                sh """
-                    docker build -t craft_demo .
-                """
-            }
-        }
-
-        stage('Push Docker Image') {
-            steps {
-                sh "docker tag craft_demo pkm23/quickbase:craft_demo"
-                sh "docker push pkm23/quickbase:craft_demo"
             }
         }
 
