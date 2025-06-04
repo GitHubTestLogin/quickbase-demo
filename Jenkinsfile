@@ -30,12 +30,6 @@ pipeline {
                     kubectl rollout status deployment.apps/demo-app
                 """
             }
-        }
-    }
-
-//    post {
- //       always {
- //           sh 'docker logout'
- //       }
-//    }
+       }
+ 
 }
