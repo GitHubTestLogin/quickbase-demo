@@ -46,7 +46,10 @@ pipeline {
 
     stage('Deploy to Minikube') {
       steps {
+       withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]){
+        withEnv(['KUBECONFIG=C:\\Users\\Pawan Mishra\\.kube\\config']) {
         bat """
+          kubectl config use-context minikube
           kubectl delete deployment qb-craft-app --ignore-not-found
           kubectl delete service qb-craft-app-service --ignore-not-found
 
@@ -56,7 +59,8 @@ pipeline {
       }
     }
   }
-
+}   
+}
   post {
     failure {
       echo 'Pipeline failed.'
