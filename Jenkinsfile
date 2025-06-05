@@ -32,10 +32,9 @@ pipeline {
           kubectl config current-context
           kubectl get pods
           kubectl auth can-i create deployment
-          kubectl create deployment qb-craft-app --image=pkm23/quickbase:qb-craft_demo
+          kubectl create deployment qb-craft-app --image=pkm23/quickbase:qb-craft-demo
           kubectl expose deployment qb-craft-app --type=NodePort --port=8080 --name=qb-craft-app-service
-
-          //kubectl apply -f quickbase-demo.yaml
+         
         """
       //}
     }
