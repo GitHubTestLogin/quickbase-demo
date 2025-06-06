@@ -10,6 +10,6 @@ public class DemoController {
     @GetMapping("/demo")
     public String demo() {
        
-        return "Hello - Welcome to Quickbase";
+        return "Hello - Welcome to Quickbase Craft Demo CI CD Pipeline";
     }
 }
