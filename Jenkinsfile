@@ -24,7 +24,7 @@ pipeline {
 
    stage('Build Docker Image') {
       steps {
-        bat "docker build -t qb-craft-demo ."
+        bat "docker build -t craft-img ."
       }
     }
     
@@ -38,8 +38,8 @@ pipeline {
 
     stage('Push Docker Image to Docker Hub') {
       steps {
-        bat "docker tag qb-craft-demo pkm23/quickbase:qb-craft-demo"
-        bat "docker push pkm23/quickbase:qb-craft-demo"
+        bat "docker tag craft-img pkm23/quickbase:craft-img"
+        bat "docker push pkm23/quickbase:craft-img"
       }
     }
 
@@ -49,14 +49,14 @@ pipeline {
         withEnv(['KUBECONFIG=C:\\Users\\Pawan Mishra\\.kube\\config']) {
         bat """
           
-	        kubectl delete deployment qb-craft-app --ignore-not-found
-          kubectl delete service qb-craft-app-service --ignore-not-found
+	        kubectl delete deployment craft-app --ignore-not-found
+          kubectl delete service craft-app-service --ignore-not-found
           kubectl config use-context minikube
           kubectl config current-context
           kubectl get pods
           kubectl auth can-i create deployment
-          kubectl create deployment qb-craft-app --image=pkm23/quickbase:qb-craft-demo
-          kubectl expose deployment qb-craft-app --type=NodePort --port=8080 --name=qb-craft-app-service
+          kubectl create deployment craft-app --image=pkm23/quickbase:craft-img
+          kubectl expose deployment craft-app --type=NodePort --port=8080 --name=craft-app-service
                    
         """
       }
