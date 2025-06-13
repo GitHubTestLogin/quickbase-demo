@@ -56,7 +56,7 @@ pipeline {
           kubectl get pods
           kubectl auth can-i create deployment
           kubectl create deployment craft-app --image=pkm23/quickbase:craft-img
-          kubectl expose deployment craft-app --type=LoadBalancer --port 80 --target-port 8080 --name=craft-app-service
+          kubectl expose deployment craft-app --type=LoadBalancer --port 80 --target-port 8080
                  
         """
       }
